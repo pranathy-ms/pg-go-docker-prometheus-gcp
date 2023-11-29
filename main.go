@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -16,6 +17,11 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"golang.org/x/oauth2"
 )
+
+// Config represents the structure of the config.json file.
+type Config struct {
+	GitHubToken string `json:"github_token"`
+}
 
 var (
 	githubAPICalls = prometheus.NewCounter(prometheus.CounterOpts{
@@ -202,6 +208,25 @@ func storeSOQuestion(question SOQuestion, db *sql.DB) {
 }
 
 func main() {
+
+	// Read the contents of the config.json file
+	file, err := ioutil.ReadFile("config.json")
+	if err != nil {
+		fmt.Println("Error reading config file:", err)
+		return
+	}
+
+	// Parse the JSON content into the Config struct
+	var config Config
+	err = json.Unmarshal(file, &config)
+	if err != nil {
+		fmt.Println("Error unmarshalling JSON:", err)
+		return
+	}
+
+	// Access the GitHub token
+	githubToken := config.GitHubToken
+	fmt.Println("GitHub Token:", githubToken)
 
 	// Register metrics
 	prometheus.MustRegister(githubAPICalls)
