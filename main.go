@@ -23,6 +23,7 @@ type Config struct {
 	GitHubToken string `json:"github_token"`
 }
 
+// counters to keep track of metrics
 var (
 	githubAPICalls = prometheus.NewCounter(prometheus.CounterOpts{
 		Name: "github_api_calls_total",
